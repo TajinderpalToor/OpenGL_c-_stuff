@@ -1,0 +1,300 @@
+#include <iostream>
+#include <glad/glad.h>
+#include <GLFW/glfw3.h>
+#include <cmath>
+
+/*
+
+THE BELOW WAS BASICALLY THE MAIN CODE I TOOK THAT EXPLAINED THE PROCESS
+OF DRAWING A SQUARE AND THE TRIANGLE
+
+
+*/
+/*
+ * TO DO - put vbo and vao into arrays
+ * draw points on this
+ * make a new code to draw outline of square using points - 2d cordinates, gl_line_loop, glvertextattribpointers
+ *
+ *
+ */
+
+
+/*
+ *Index buffers
+ *what if you want to draw triangle in a triangle, you have duplicate verticies
+ * index is order in which you should go to veritices
+/*
+ * BELOW IS THE SHADER STUFF FOR THE ORANGE TRIANGLE
+ */
+
+/* shader stuff got moved to resources ->shaders folder
+ */
+
+int main() {
+
+    // creating a window using glfw
+
+    //initialize it
+    glfwInit();
+
+
+    /*
+     * Steps so far
+     *
+     * 1. use the hint function to say which version of opengl to use
+     * major and minor is like if you want to use opengl 3.3, then 3 is the major
+     * and 3 is the minor, then you also specify the type of opengl(modern or core).
+     * The above are all the glfwwindow hint lines
+     *
+     * 2. use the GLfloat verticies [] daatype to list all the verticies of the shapes
+     *    you want to make. we used the weird float stuff to make equilateral triangle
+     *
+     * 3. Create the window itself thats gonna appear, place the name and size
+     *    use glfwMakeContextCurrent(window); to basically say this is the window to
+     *    render to
+     * 4. gladLoadGL() loads all the opengl functions the gpu supports, so it basically
+     *    asks for the location of the drivers like create shaders and what not allowing you to do things
+     *
+     *  5. glViewport(): basically but the cordinates of the window you want to draw too
+     *
+     *  6. Shaders are small programs that run on the gpu, vertex shaders runs once per vertex, so
+     *  3 small programs for 3 vertex. Shaders are the program that tell gpu how to determine to
+     *  run 3d models, textures,etc.. Vertex shaders can say where is the point, does it move,rotate,scale.etc
+     *  Fragement shader once it knows where the vertecies are, fills it in with pixels
+
+        7. GLuint, is basically an int, that is like a ticket number, so like     GLuint vertexShader = glCreateShader(GL_VERTEX_SHADER);
+        vertex shader holds the ticker or id for that process
+
+        8. youve created all your shader programs now and now you have to attach them to this
+        program. then you link, then delete them because the linker has them them done by the following:
+
+        */
+
+    //glAttachShader(shaderProgram,vertexShader);
+    //glAttachShader(shaderProgram,fragmentShader);
+
+
+
+    //glfw doesnt know which version of open gl so use hint a special function
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+    //which opengl profile
+    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+
+    // array of datatype of glfloat
+    GLfloat verticies [] = {
+        -0.5f,-0.5f * float(sqrt(3)) /3,0.0f,
+         0.5f,-0.5f * float(sqrt(3)) /3,0.0f,
+        0.0f,0.5f * float(sqrt(3)) * 2 /3,0.0f,
+
+        -0.5f / 2,0.5f * float(sqrt(3)) /6,0.0f, //innerleft
+         0.5f / 2,0.5f * float(sqrt(3)) /6,0.0f, //inner right
+        0.0f,-0.5f     * float(sqrt(3)) /3,0.0f // innner down
+
+
+    };
+
+    GLuint indices[] = {
+        0,3,5,
+        3,2,4,
+        5,4,1
+    };
+
+    // verticies for the square
+
+    GLfloat squareverticies [] = {
+        // Triangle 1
+         0.6f,  0.5f, 0.0f,  // A
+         0.8f,  0.5f, 0.0f,  // B
+         0.6f, 0.7f, 0.0f,  // C
+
+        // Triangle 2
+         0.8f,  0.5f, 0.0f,  // A
+         0.8f,  0.7f, 0.0f,  // C
+         0.6f,   0.7f, 0.0f   // D
+    };
+
+   // shaders are an opengl object - can only access by references
+
+    // create the window itself - below is the datatype for it
+    //width,height,name,full screen or not, ??
+    GLFWwindow* window = glfwCreateWindow(800,800,"YoutubeOpenGL",NULL,NULL);
+    if (window == NULL) {
+        std::cout << "Failed to create GLFW window" << std::endl;
+        glfwTerminate();
+        return -1;
+    }
+
+    // have to tell it that ive created the window but also want touse it
+    glfwMakeContextCurrent(window);
+
+    // add color to it
+    gladLoadGL();
+
+    //tell opengl viewport of window, area of window that you want opengl to render
+    // bottom left  to top right
+    glViewport(0,0,800,800);
+
+    // create reference to access shader verticies
+    GLuint vertexShader = glCreateShader(GL_VERTEX_SHADER);
+    glShaderSource(vertexShader,1,&vertexShaderSource,NULL);
+    glCompileShader(vertexShader);
+
+    GLuint fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
+    glShaderSource(fragmentShader,1,&fragmentShaderSource,NULL);
+    glCompileShader(fragmentShader);
+
+    // two use the shaders have to wrap them up into shader program
+    //GLuint shaderProgram = glCreateProgram();
+    GLuint shaderProgram = glCreateProgram();
+
+    glAttachShader(shaderProgram,vertexShader);
+    glAttachShader(shaderProgram,fragmentShader);
+
+    glLinkProgram(shaderProgram);
+    glDeleteShader(vertexShader);
+    glDeleteShader(fragmentShader);
+
+    // ---------------------------------------------------------------------
+
+    GLuint vertexshader2 = glCreateShader(GL_VERTEX_SHADER);
+    glShaderSource(vertexshader2,1,&vertexShaderSource2,NULL);
+    glCompileShader(vertexshader2);
+
+    GLuint fragmentshader2 = glCreateShader(GL_FRAGMENT_SHADER);
+    glShaderSource(fragmentshader2,1,&fragmentShaderSource2,NULL);
+    glCompileShader(fragmentshader2);
+
+    GLuint shaderProgram2 = glCreateProgram();
+
+    glAttachShader(shaderProgram2,vertexshader2);
+    glAttachShader(shaderProgram2,fragmentshader2);
+
+    // check that the above happened correctly
+
+    glLinkProgram(shaderProgram2);
+
+    int success;
+    char infolog[512];
+    glGetProgramiv(shaderProgram2,GL_LINK_STATUS, &success);
+    if (!success) {
+        glGetProgramInfoLog(shaderProgram2,512,NULL,infolog);
+        std::cout << "Failed to link shader program" << std::endl;
+    }
+
+    glDeleteShader(vertexshader2);
+    glDeleteShader(fragmentshader2);
+
+    /* 9. VBO = VERTEX BUFFER OBJECT, stores the vertex data on the gpu, right
+     * now they live on cpu ram, so with this we are storing it, gpu memory block
+     * VAO: vertex array object, stores how opengl should interprt the vertex data
+     *
+     * 10. glgenvertexarrays(1,&vao) - create 1 vao and give me its id, same idea for genbuffers
+     * at this point both the vbo and vao exsist, but we need to assign to it
+     * so with bindvertexarray, we open vao so we can edit it
+     * open the vbo and make it the active one, glbindbuffer
+     *
+     * 11. copy the verticies into the vbo - glbufferdata
+     * 12. glVertexAttribPointer: the vbo just has numbers stored, but we need to say
+     * what they mean, so with this the vao remember the following info:
+    * Location 0 contains
+        3 float values
+        for every vertex
+        starting at byte 0
+
+        13. enable the above glEnableVertexAttribArray(0); - okay opengl use the attributes
+
+     */
+    // EBO is the index buffer one
+
+
+    GLuint VAO, VBO, EBO;
+//create buffer obj
+    glGenVertexArrays(1, &VAO);
+
+    glGenBuffers(1, &VBO);
+    glGenBuffers(1,&EBO);
+    glBindVertexArray(VAO);
+
+    // you need to use array buffer for the vertex - there is other buffers
+    glBindBuffer(GL_ARRAY_BUFFER,VBO);
+    //glBufferData(GL_ELEMENT_ARRAY_BUFFER,sizeof(indices),indices,GL_STATIC_DRAW);
+    //store vertex into vbo
+    glBufferData(GL_ARRAY_BUFFER,sizeof(verticies),verticies,GL_STATIC_DRAW);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,EBO);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER,sizeof(indices),indices,GL_STATIC_DRAW);
+    //vertex array object, tells opengl how to incorporate the vbo
+
+    glVertexAttribPointer(0,3,GL_FLOAT,GL_FALSE,3*sizeof(float),(void*)0);
+
+    // enable above
+    glEnableVertexAttribArray(0);
+
+    //for the square
+    GLuint VAO2,VB02;
+    glGenVertexArrays(1, &VAO2);
+    glGenBuffers(1, &VB02);
+    glBindVertexArray(VAO2);
+    glBindBuffer(GL_ARRAY_BUFFER,VB02);
+    glBufferData(GL_ARRAY_BUFFER,sizeof(squareverticies),squareverticies,GL_STATIC_DRAW);
+    glVertexAttribPointer(1,3,GL_FLOAT,GL_FALSE,3*sizeof(float),(void*)0);
+    glEnableVertexAttribArray(1);
+
+    /*
+     *14. the below is like okay we are done doing stuff with them now so close them
+    *  glBindBuffer(GL_ARRAY_BUFFER,0);
+        glBindVertexArray(0);
+
+     *
+     * 15. glClearcolor = the color you wanna fill the screen with, then the glclear fills it
+     * 16. create while loop to keep it up until we do sometjing the gluseprogram selects the shader program
+     * then call the vao, which is how we use the verticies and which vbo then draw it
+     *
+     *
+     */
+
+    glBindBuffer(GL_ARRAY_BUFFER,0);
+    glBindVertexArray(0);
+
+    // the ebo is in the vao so have to do it after unbinding that
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,0);
+
+
+    //alpha is the transparency, wheere 1 is opaque
+    //glClearColor(0.07f,0.13f,0.17f,1.0f);
+    //glClear(GL_COLOR_BUFFER_BIT);
+    //swap the buffer to see the colors being displayed
+    glfwSwapBuffers(window);
+    while (!glfwWindowShouldClose(window)) {
+        // this while loop is basically only close it when the close
+        //button is pressed
+        glClearColor(0.07f,0.13f,0.17f,1.0f);
+        glClear(GL_COLOR_BUFFER_BIT);
+
+        glUseProgram(shaderProgram);
+        glBindVertexArray(VAO);
+        glDrawElements(GL_TRIANGLES,9,GL_UNSIGNED_INT,0);
+        //glDrawArrays(GL_TRIANGLES,0,3);
+        glUseProgram(shaderProgram2);
+        glBindVertexArray(VAO2);
+        glDrawArrays(GL_TRIANGLES,0,6);
+        glfwSwapBuffers(window);
+
+        //process all the events like windows resize and stuff other wise
+        //not respond
+        glfwPollEvents();
+    }
+
+    glDeleteVertexArrays(1, &VAO);
+    glDeleteBuffers(1, &VBO);
+    glDeleteProgram(shaderProgram);
+
+    glDeleteVertexArrays(1, &VAO2);
+    glDeleteBuffers(1, &VB02);
+    glDeleteProgram(shaderProgram2);
+    // delete window after using it
+    glfwDestroyWindow(window);
+    //terminate it
+    glfwTerminate();
+    return 0;
+}
