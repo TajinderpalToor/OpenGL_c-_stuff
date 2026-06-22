@@ -1,0 +1,11 @@
+need to download opengl mathematics for the 3d stuff
+
+// model matrix - local to world 
+view matrix - world to view
+projection matrix = view to clip
+automatic is clip to screen
+
+all these matricies are 4D - glm takes care of this 
+
+
+// go through the 3d stuff
